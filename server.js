@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
 const { 
     getAllDepartments,
+    addDepartment,
     getAllRoles,
     getAllEmployees,
     endConnection
@@ -54,7 +55,24 @@ function startApp() {
                 });
                 break;
             case 'Add Department':
-                startApp();
+                inquirer.prompt([
+                    {
+                        type: 'input',
+                        name: 'name',
+                        message: 'What is the name of the department?'
+                    }
+                ])
+                .then((response) => {
+                    addDepartment(response.name)
+                        .then(() => {
+                            console.log(`Added ${response.name} to the database`);
+                            startApp();
+                        })
+                        .catch((err) => {
+                            console.log(`Error adding department: ${err}`);
+                            startApp();
+                        });
+                    });
                 break;
             case 'Quit':
                 endConnection();

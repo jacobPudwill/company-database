@@ -11,12 +11,17 @@ const db = mysql.createPool(
         connectionLimit: 10,
         queueLimit: 0
     },
-    console.log('Connected to the', process.env.DB_NAME, 'database.')
+    console.log(`Connected to the ${process.env.DB_NAME} database.`)
 );
 
 function getAllDepartments() {
     const query = 'SELECT d.id, d.name FROM departments d';
     return db.promise().query(query).then(([rows]) => rows);
+}
+
+function addDepartment(name) {
+    const query = 'INSERT INTO departments (name) VALUES (?)';
+    return db.promise().query(query, [name]);
 }
 
 function getAllRoles() {
@@ -43,6 +48,7 @@ function endConnection() {
 
 module.exports = {
     getAllDepartments,
+    addDepartment,
     getAllRoles,
     getAllEmployees,
     endConnection

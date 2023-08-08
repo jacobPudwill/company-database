@@ -1,5 +1,10 @@
 const inquirer = require('inquirer');
-const db = require('./config/connection');
+const { 
+    getAllDepartments,
+    getAllRoles,
+    getAllEmployees,
+    endConnection
+} = require('./config/connection');
 
 function startApp() {
     inquirer.prompt([
@@ -22,7 +27,10 @@ function startApp() {
     .then((response) => {
         switch (response.choice) {
             case 'View All Employees':
-                startApp();
+                getAllEmployees().then((employees) => {
+                    console.table(employees);
+                    startApp();
+                });
                 break;
             case 'Add Employee':
                 startApp();
@@ -31,20 +39,25 @@ function startApp() {
                 startApp();
                 break;
             case 'View All Roles':
-                startApp();
+                getAllRoles().then((roles) => {
+                    console.table(roles);
+                    startApp();
+                });
                 break;
             case 'Add Role':
                 startApp();
                 break;
             case 'View All Departments':
-                startApp();
+                getAllDepartments().then((departments) => {
+                    console.table(departments);
+                    startApp();
+                });
                 break;
             case 'Add Department':
                 startApp();
                 break;
             case 'Quit':
-                console.log('Quitting the Company Database.');
-                db.end();
+                endConnection();
                 break;
             default:
                 console.log('Invalid choice. Please try again.');

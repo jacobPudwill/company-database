@@ -32,6 +32,11 @@ function getAllRoles() {
     return db.promise().query(query).then(([rows]) => rows);
 }
 
+function addRole(title, salary, department_id) {
+    const query = 'INSERT INTO roles (title, salary, department_id) VALUES (?, ?, ?)';
+    return db.promise().query(query, [title, salary, department_id]);
+}
+
 function getAllEmployees() {
     const query = 
     `SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager
@@ -50,6 +55,7 @@ module.exports = {
     getAllDepartments,
     addDepartment,
     getAllRoles,
+    addRole,
     getAllEmployees,
     endConnection
 };

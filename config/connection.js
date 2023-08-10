@@ -51,6 +51,11 @@ function addEmployee(first_name, last_name, role_id, manager_id) {
     return db.promise().query(query, [first_name, last_name, role_id, manager_id]);
 }
 
+function updateEmployeeRole(role_id, employee_id) {
+    const query = 'UPDATE employees SET role_id = ? WHERE id = ?';
+    return db.promise().query(query, [role_id, employee_id]);
+}
+
 function endConnection() {
     console.log('Quitting the Company Database.');
     db.end();
@@ -63,5 +68,6 @@ module.exports = {
     addRole,
     getAllEmployees,
     addEmployee,
+    updateEmployeeRole,
     endConnection
 };

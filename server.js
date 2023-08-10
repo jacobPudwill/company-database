@@ -5,8 +5,9 @@ const {
     getAllRoles,
     addRole,
     getAllEmployees,
-    endConnection,
-    addEmployee
+    addEmployee,
+    updateEmployeeRole,
+    endConnection
 } = require('./config/connection');
 
 function startApp() {
@@ -28,6 +29,12 @@ function startApp() {
         }
     ])
     .then(async (response) => {
+        const roles = await getAllRoles();
+        const employees = await getAllEmployees();
+
+        const roleChoices = roles.map((role) => role.title);
+        const employeeChoices = employees.map((employee) => `${employee.first_name} ${employee.last_name}`);
+
         switch (response.choice) {
             case 'View All Employees':
                 getAllEmployees()
@@ -36,13 +43,7 @@ function startApp() {
                         startApp();
                     });
                 break;
-            case 'Add Employee':
-                const roles = await getAllRoles();
-                const employees = await getAllEmployees();
-
-                const roleChoices = roles.map((role) => role.title);
-                const employeeChoices = employees.map((employee) => `${employee.first_name} ${employee.last_name}`);
-                
+            case 'Add Employee':                
                 inquirer.prompt([
                     {
                         type: 'input',
@@ -83,7 +84,34 @@ function startApp() {
                 });
                 break;
             case 'Update Employee Role':
-                startApp();
+                inquirer.prompt([
+                    {
+                        type: 'list',
+                        name: 'employee',
+                        message: `Which employee's role do you want to update?`,
+                        choices: employeeChoices
+                    },
+                    {
+                        type: 'list',
+                        name: 'role',
+                        message: 'Which role do you want to assign to the selected employee?',
+                        choices: roleChoices
+                    }
+                ])
+                .then((response) => {
+                    const role = roles.filter(role => role.title === response.role)[0];
+                    const employee = employees.filter(employee => `${employee.first_name} ${employee.last_name}` === response.employee)[0];
+
+                    updateEmployeeRole(role.id, employee.id)
+                        .then(() => {
+                            console.log(`Updated employee's role`);
+                            startApp();
+                        })
+                        .catch((err) => {
+                            console.error(`Error updating employee's role: ${err}`);
+                            startApp();
+                        });
+                });
                 break;
             case 'View All Roles':
                 getAllRoles()

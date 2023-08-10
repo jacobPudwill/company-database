@@ -37,11 +37,8 @@ function startApp() {
 
         switch (response.choice) {
             case 'View All Employees':
-                getAllEmployees()
-                    .then((employees) => {
-                        console.table(employees);
-                        startApp();
-                    });
+                console.table(employees);
+                startApp();
                 break;
             case 'Add Employee':                
                 inquirer.prompt([
@@ -114,50 +111,43 @@ function startApp() {
                 });
                 break;
             case 'View All Roles':
-                getAllRoles()
-                    .then((roles) => {
-                        console.table(roles);
-                        startApp();
-                    });
+                console.table(roles);
+                startApp();
                 break;
             case 'Add Role':
-                getAllDepartments()
-                    .then((departments) => {
+                const departments = await getAllDepartments();
+                console.log(departments);
 
-                    inquirer.prompt([
-                        {
-                            type: 'input',
-                            name: 'title',
-                            message: 'What is the name of the role?'
-                        },
-                        {
-                            type: 'input',
-                            name: 'salary',
-                            message: 'What is the salary of the role?'
-                        },
-                        {
-                            type: 'list',
-                            name: 'department',
-                            message: 'Which department does the role belong to?',
-                            choices: departments
-                        }
-                    ])
-                    .then((response) => {
-                        const department = departments.filter(department => department.name === response.department)[0];
+                inquirer.prompt([
+                    {
+                        type: 'input',
+                        name: 'title',
+                        message: 'What is the name of the role?'
+                    },
+                    {
+                        type: 'input',
+                        name: 'salary',
+                        message: 'What is the salary of the role?'
+                    },
+                    {
+                        type: 'list',
+                        name: 'department',
+                        message: 'Which department does the role belong to?',
+                        choices: departments
+                    }
+                ])
+                .then((response) => {
+                    const department = departments.filter(department => department.name === response.department)[0];
 
-                        addRole(response.title, response.salary, department.id)
-                            .then(() => {
-                                console.log(`Added ${response.title} to the database`);
-                                startApp();
-                            })
-                            .catch((err) => {
-                                console.error(`Error adding department: ${err}`);
-                                startApp();
-                            });
+                    addRole(response.title, response.salary, department.id)
+                        .then(() => {
+                            console.log(`Added ${response.title} to the database`);
+                            startApp();
+                        })
+                        .catch((err) => {
+                            console.error(`Error adding department: ${err}`);
+                            startApp();
                         });
-                    })
-                    .catch((err) => {
-                        console.error(`Error fetching departments: ${err}`);
                     });
                 break;
             case 'View All Departments':

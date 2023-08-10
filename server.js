@@ -123,7 +123,6 @@ function startApp() {
                 break;
             case 'Add Role':
                 const departments = await getAllDepartments();
-                console.log(departments);
 
                 inquirer.prompt([
                     {

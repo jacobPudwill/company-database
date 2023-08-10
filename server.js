@@ -5,7 +5,8 @@ const {
     getAllRoles,
     addRole,
     getAllEmployees,
-    endConnection
+    endConnection,
+    addEmployee
 } = require('./config/connection');
 
 function startApp() {
@@ -26,7 +27,7 @@ function startApp() {
             ]
         }
     ])
-    .then((response) => {
+    .then(async (response) => {
         switch (response.choice) {
             case 'View All Employees':
                 getAllEmployees()
@@ -36,7 +37,50 @@ function startApp() {
                     });
                 break;
             case 'Add Employee':
-                startApp();
+                const roles = await getAllRoles();
+                const employees = await getAllEmployees();
+
+                const roleChoices = roles.map((role) => role.title);
+                const employeeChoices = employees.map((employee) => `${employee.first_name} ${employee.last_name}`);
+                
+                inquirer.prompt([
+                    {
+                        type: 'input',
+                        name: 'first_name',
+                        message: `What is the employee's first name?`
+                    },
+                    {
+                        type: 'input',
+                        name: 'last_name',
+                        message: `What is the employee's last name?`
+                    },
+                    {
+                        type: 'list',
+                        name: 'role',
+                        message: `What is the employee's role?`,
+                        choices: roleChoices
+                    },
+                    {
+                        type: 'list',
+                        name: 'manager',
+                        message: `Who is the employee's manager?`,
+                        choices: employeeChoices
+                    }
+                ])
+                .then((response) => {
+                    const role = roles.filter(role => role.title === response.role)[0];
+                    const manager = employees.filter(employee => `${employee.first_name} ${employee.last_name}` === response.manager)[0];
+
+                    addEmployee(response.first_name, response.last_name, role.id, manager.id)
+                        .then(() => {
+                            console.log(`Added ${response.first_name} ${response.last_name} to the database`);
+                            startApp();
+                        })
+                        .catch((err) => {
+                            console.error(`Error adding employee: ${err}`);
+                            startApp();
+                        });
+                });
                 break;
             case 'Update Employee Role':
                 startApp();
@@ -51,10 +95,6 @@ function startApp() {
             case 'Add Role':
                 getAllDepartments()
                     .then((departments) => {
-                    const departmentChoices = departments.map((department) => ({
-                        name: department.name,
-                        id: department.id
-                    }));
 
                     inquirer.prompt([
                         {
@@ -71,13 +111,13 @@ function startApp() {
                             type: 'list',
                             name: 'department',
                             message: 'Which department does the role belong to?',
-                            choices: departmentChoices
+                            choices: departments
                         }
                     ])
                     .then((response) => {
-                        const department = departmentChoices.filter(department => department.name === response.department);
+                        const department = departments.filter(department => department.name === response.department)[0];
 
-                        addRole(response.title, response.salary, department[0].id)
+                        addRole(response.title, response.salary, department.id)
                             .then(() => {
                                 console.log(`Added ${response.title} to the database`);
                                 startApp();

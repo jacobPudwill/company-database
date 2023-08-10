@@ -46,6 +46,11 @@ function getAllEmployees() {
     return db.promise().query(query).then(([rows]) => rows);
 }
 
+function addEmployee(first_name, last_name, role_id, manager_id) {
+    const query = 'INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)';
+    return db.promise().query(query, [first_name, last_name, role_id, manager_id]);
+}
+
 function endConnection() {
     console.log('Quitting the Company Database.');
     db.end();
@@ -57,5 +62,6 @@ module.exports = {
     getAllRoles,
     addRole,
     getAllEmployees,
+    addEmployee,
     endConnection
 };

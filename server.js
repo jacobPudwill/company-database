@@ -40,7 +40,9 @@ function startApp() {
                 console.table(employees);
                 startApp();
                 break;
-            case 'Add Employee':                
+            case 'Add Employee':
+                employeeChoices.unshift('None');
+
                 inquirer.prompt([
                     {
                         type: 'input',
@@ -67,7 +69,12 @@ function startApp() {
                 ])
                 .then((response) => {
                     const role = roles.filter(role => role.title === response.role)[0];
-                    const manager = employees.filter(employee => `${employee.first_name} ${employee.last_name}` === response.manager)[0];
+                    let manager;
+                    if (response.manager === 'None') {
+                        manager = {id: null};
+                    } else {
+                        manager = employees.filter(employee => `${employee.first_name} ${employee.last_name}` === response.manager)[0];
+                    }
 
                     addEmployee(response.first_name, response.last_name, role.id, manager.id)
                         .then(() => {
